@@ -10,3 +10,6 @@ Content-Type: application/json
   "warningTimeInMinutes": 1,
   "blindLevels": [1,2,4,8]
 }
+
+### error testing
+GET http://localhost:8080/config/error/
