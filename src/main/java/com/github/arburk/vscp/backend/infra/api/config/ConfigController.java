@@ -20,7 +20,6 @@ public class ConfigController {
 
   private final Logger log = LoggerFactory.getLogger(ConfigController.class.getName());
 
-
   @GetMapping(value = "/", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_PROBLEM_JSON_VALUE})
   public PokerTimerConfig getConfig() {
 

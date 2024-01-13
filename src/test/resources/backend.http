@@ -29,3 +29,8 @@ Content-Type: application/json
 ### error testing
 GET http://localhost:8080/config/error/
 Authorization: Basic user password
+
+############### OAUTH2
+### get config authenticated
+GET http://localhost:8080/config/
+Authorization: Bearer {{$auth.token("google")}}

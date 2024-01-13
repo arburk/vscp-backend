@@ -69,8 +69,6 @@ public class UserInfo {
 
     if (oidcUSerInfo.get() instanceof OidcUserAuthority oidcUA) {
       final Map<String, Object> attributes = oidcUA.getAttributes();
-      attributes.get("name");
-
       return new User(
           oauth2token.getName(),
           String.valueOf(attributes.get("name")),
