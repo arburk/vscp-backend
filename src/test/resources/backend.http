@@ -1,0 +1,12 @@
+### get config
+GET http://localhost:8080/config/
+
+### update config
+POST http://localhost:8080/config/
+Content-Type: application/json
+
+{
+  "roundInMinutes": 12,
+  "warningTimeInMinutes": 1,
+  "blindLevels": [1,2,4,8]
+}
