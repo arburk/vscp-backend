@@ -1,8 +1,23 @@
-### get config
+### get config anonymous
 GET http://localhost:8080/config/
 
-### update config
+### get config authenticated
+GET http://localhost:8080/config/
+Authorization: Basic user password
+
+### update config anonymous
 POST http://localhost:8080/config/
+Content-Type: application/json
+
+{
+  "roundInMinutes": 12,
+  "warningTimeInMinutes": 1,
+  "blindLevels": [1,2,4,8]
+}
+
+### update config authenitcated
+POST http://localhost:8080/config/
+Authorization: Basic admin password
 Content-Type: application/json
 
 {
@@ -13,3 +28,4 @@ Content-Type: application/json
 
 ### error testing
 GET http://localhost:8080/config/error/
+Authorization: Basic user password
