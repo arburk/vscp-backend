@@ -34,3 +34,8 @@ Authorization: Basic user password
 ### get config authenticated
 GET http://localhost:8080/config/
 Authorization: Bearer {{$auth.token("google")}}
+
+############### OAUTH2 Keycloak
+### get config authenticated
+GET http://localhost:8080/config/
+Authorization: Bearer {{$auth.token("keycloak")}}

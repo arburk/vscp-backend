@@ -6,3 +6,21 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            client-name: "VSCP Keycloak test client"
+            provider: "keycloak"
+            scope: "openid,profile,email"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-authentication-method: "client_secret_basic"
+            authorization-grant-type: "authorization_code"
+
+        provider:
+          keycloak:
+            authorization-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/auth"
+            token-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/token"
+            user-info-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/userinfo"
+            user-info-authentication-method: "body"
+            jwk-set-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/certs"
+            user-name-attribute: "name"

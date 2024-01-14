@@ -1,9 +1,11 @@
 package com.github.arburk.vscp.backend.infra.api.config;
 
+import com.github.arburk.vscp.backend.config.api.AuthorizedParty;
 import com.github.arburk.vscp.backend.config.api.UserInfo;
 import com.github.arburk.vscp.backend.core.domain.PokerTimerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +21,16 @@ import java.util.Collections;
 public class ConfigController {
 
   private final Logger log = LoggerFactory.getLogger(ConfigController.class.getName());
+  private AuthorizedParty authParty;
+
+  public ConfigController(final AuthorizedParty authParty) {
+    this.authParty = authParty;
+  }
 
   @GetMapping(value = "/", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_PROBLEM_JSON_VALUE})
   public PokerTimerConfig getConfig() {
 
-    UserInfo.getAsUser().ifPresent(user -> log.info(user.toString()));
+    UserInfo.getAsUser(authParty).ifPresent(user -> log.info(user.toString()));
 
     PokerTimerConfig pokerTimerConfig = new PokerTimerConfig((short) 12, (short) 1, Collections.emptyList());
     log.info("TODO: inject service to get config {}", pokerTimerConfig);

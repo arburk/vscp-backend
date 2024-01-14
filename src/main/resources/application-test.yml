@@ -1,0 +1,11 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-client-id
+            client-secret: myTestGoogleClientSecret
+          keycloak:
+            client-id: test-keycloak-client-id
+            client-secret: myTestKeycloakClientSecret
