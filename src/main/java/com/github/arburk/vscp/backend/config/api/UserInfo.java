@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +43,10 @@ public class UserInfo {
       return Optional.of(getAsBasicUser(userPass));
     }
 
+    if(authentication instanceof JwtAuthenticationToken jwtToken) {
+      return Optional.of(mapUserFromOidcAttributes(authParty, jwtToken.getTokenAttributes()));
+    }
+
     log.warn("unknown authentication object {}", authentication.getClass());
     return Optional.of(getBasicUserFallback(authentication));
   }
@@ -67,21 +72,22 @@ public class UserInfo {
       return getBasicUserFallback(oauth2token);
     }
 
-    if (oidcUSerInfo.get() instanceof OidcUserAuthority oidcUA) {
-      final Map<String, Object> attributes = oidcUA.getAttributes();
-      return new User(
-          String.valueOf(attributes.get("azp")),
-          String.valueOf(attributes.get("sub")),
-          resolveUsername(attributes, authParty),
-          String.valueOf(attributes.get("name")),
-          String.valueOf(attributes.get("given_name")),
-          String.valueOf(attributes.get("family_name")),
-          String.valueOf(attributes.get("email")),
-          String.valueOf(attributes.get("picture")),
-          Collections.emptyList());
-    }
+    return oidcUSerInfo.get() instanceof OidcUserAuthority oidcUA
+        ? mapUserFromOidcAttributes(authParty, oidcUA.getAttributes())
+        : getBasicUserFallback(oauth2token);
+  }
 
-    return getBasicUserFallback(oauth2token);
+  private static User mapUserFromOidcAttributes(final AuthorizedParty authParty, final Map<String, Object> oidcUAAttributes) {
+    return new User(
+        String.valueOf(oidcUAAttributes.get("azp")),
+        String.valueOf(oidcUAAttributes.get("sub")),
+        resolveUsername(oidcUAAttributes, authParty),
+        String.valueOf(oidcUAAttributes.get("name")),
+        String.valueOf(oidcUAAttributes.get("given_name")),
+        String.valueOf(oidcUAAttributes.get("family_name")),
+        String.valueOf(oidcUAAttributes.get("email")),
+        String.valueOf(oidcUAAttributes.get("picture")),
+        Collections.emptyList());
   }
 
   private static String resolveUsername(final Map<String, Object> attributes, final AuthorizedParty authParty) {

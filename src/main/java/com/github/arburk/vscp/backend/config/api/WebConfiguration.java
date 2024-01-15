@@ -39,7 +39,9 @@ public class WebConfiguration implements WebMvcConfigurer {
         )
         .cors(Customizer.withDefaults())
         .httpBasic(Customizer.withDefaults())
-        .oauth2Login(login -> login.setBuilder(http));
+        .oauth2Client(Customizer.withDefaults())
+        .oauth2Login(login -> login.setBuilder(http))
+        .oauth2ResourceServer(configure -> configure.jwt(Customizer.withDefaults()));
     return http;
   }
 

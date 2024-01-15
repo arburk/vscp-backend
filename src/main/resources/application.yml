@@ -18,9 +18,14 @@ spring:
 
         provider:
           keycloak:
-            authorization-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/auth"
-            token-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/token"
-            user-info-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/userinfo"
+            base-uri: "${KEYCLOAK_SERVER}/realms/${KEYCLOAK_REALM}"
+            authorization-uri: "${spring.security.oauth2.client.provider.keycloak.base-uri}/protocol/openid-connect/auth"
+            token-uri: "${spring.security.oauth2.client.provider.keycloak.base-uri}/protocol/openid-connect/token"
+            user-info-uri: "${spring.security.oauth2.client.provider.keycloak.base-uri}/protocol/openid-connect/userinfo"
             user-info-authentication-method: "body"
-            jwk-set-uri: "http://localhost:8081/realms/vscp/protocol/openid-connect/certs"
+            jwk-set-uri: "${spring.security.oauth2.client.provider.keycloak.base-uri}/protocol/openid-connect/certs"
             user-name-attribute: "name"
+      resourceserver:
+        jwt:
+          issuer-uri: ${spring.security.oauth2.client.provider.keycloak.base-uri}
+          jwk-set-uri: ${spring.security.oauth2.client.provider.keycloak.base-uri}/protocol/openid-connect/certs

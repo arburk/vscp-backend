@@ -26,6 +26,17 @@ Content-Type: application/json
   "blindLevels": [1,2,4,8]
 }
 
+### update config with token
+POST http://localhost:8080/config/
+Authorization: Bearer {{$auth.token("keycloak")}}
+Content-Type: application/json
+
+{
+  "roundInMinutes": 12,
+  "warningTimeInMinutes": 1,
+  "blindLevels": [1,2,4,8]
+}
+
 ### error testing
 GET http://localhost:8080/config/error/
 Authorization: Basic user password

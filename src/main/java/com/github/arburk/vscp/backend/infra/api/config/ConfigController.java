@@ -5,7 +5,6 @@ import com.github.arburk.vscp.backend.config.api.UserInfo;
 import com.github.arburk.vscp.backend.core.domain.PokerTimerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

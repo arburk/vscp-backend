@@ -9,3 +9,6 @@ spring:
           keycloak:
             client-id: test-keycloak-client-id
             client-secret: myTestKeycloakClientSecret
+        provider:
+          keycloak:
+            base-uri: "http://localhost:8081/realms/vscp"
