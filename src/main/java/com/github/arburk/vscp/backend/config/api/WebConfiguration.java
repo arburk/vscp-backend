@@ -59,22 +59,4 @@ public class WebConfiguration implements WebMvcConfigurer {
     return http;
   }
 
-
-  @Bean
-  public UserDetailsService users() {
-    // The builder will ensure the passwords are encoded before saving in memory
-    User.UserBuilder users = User.withDefaultPasswordEncoder(); // for demo only
-    UserDetails user = users
-        .username("user")
-        .password("password")
-        .roles("USER")
-        .build();
-    UserDetails admin = users
-        .username("admin")
-        .password("password")
-        .roles("USER", "ADMIN")
-        .build();
-    return new InMemoryUserDetailsManager(user, admin);
-  }
-
 }
