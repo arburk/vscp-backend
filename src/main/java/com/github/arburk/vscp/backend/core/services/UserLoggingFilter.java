@@ -29,5 +29,7 @@ public class UserLoggingFilter implements Filter {
       userInfoService.getUserRepo().add(user);
     });
     log.info(userInfoService.getUserRepo().stream().map(User::userName).collect(Collectors.joining(", ")));
+
+    filterChain.doFilter(servletRequest, servletResponse);
   }
 }

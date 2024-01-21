@@ -12,3 +12,9 @@ spring:
         provider:
           keycloak:
             base-uri: "http://localhost:8081/realms/vscp"
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

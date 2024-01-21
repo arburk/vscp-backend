@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,6 +42,7 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
   @Getter private final Set<User> userRepo = new HashSet<>();
 
   private static final String ATTR_REALM_ACCESS = "realm_access";
+  private static final String ATTR_RESOURCE_ACCESS = "resource_access";
   private static final String ATTR_EMAIL = "email";
   private static final String ATTR_AZP = "azp";
   public static final String ATTR_ROLES = "roles";
@@ -54,6 +56,7 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
 
   @Override
   public Collection<GrantedAuthority> convert(final Jwt jwt) {
+    // TODO ATTR_RESOURCE_ACCESS
     final Map<String, Object> realmAccess = jwt.getClaim(ATTR_REALM_ACCESS);
     return realmAccess != null
         && realmAccess.containsKey(ATTR_ROLES)
@@ -146,7 +149,21 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
         String.valueOf(oidcUAAttributes.get("family_name")),
         String.valueOf(oidcUAAttributes.get(ATTR_EMAIL)),
         String.valueOf(oidcUAAttributes.get("picture")),
-        mapRoles(oidcUAAttributes.get(ATTR_REALM_ACCESS)));
+        mapRolesFromAttr(oidcUAAttributes));
+  }
+
+  private static List<String> mapRolesFromAttr(final Map<String, Object> attributes) {
+    final List<String> mappedRoles = new ArrayList<>();
+
+    if (attributes.containsKey(ATTR_REALM_ACCESS)) {
+      mappedRoles.addAll(mapRoles(attributes.get(ATTR_REALM_ACCESS)));
+    }
+
+    if (attributes.containsKey(ATTR_RESOURCE_ACCESS)) {
+      mappedRoles.addAll(mapRoles(attributes.get(ATTR_RESOURCE_ACCESS)));
+    }
+
+    return mappedRoles;
   }
 
   private static List<String> mapRoles(final Object potentialAttributes) {
