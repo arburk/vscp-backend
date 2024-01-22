@@ -56,8 +56,12 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
 
   @Override
   public Collection<GrantedAuthority> convert(final Jwt jwt) {
-    // TODO ATTR_RESOURCE_ACCESS
-    final Map<String, Object> realmAccess = jwt.getClaim(ATTR_REALM_ACCESS);
+    final var result = new ArrayList<>(mapClaimAsGrantedAuthorities(jwt.getClaim(ATTR_REALM_ACCESS)));
+    result.addAll(mapClaimAsGrantedAuthorities(jwt.getClaim(ATTR_RESOURCE_ACCESS)));
+    return result;
+  }
+
+  private static List<GrantedAuthority> mapClaimAsGrantedAuthorities(final Map<String, Object> realmAccess) {
     return realmAccess != null
         && realmAccess.containsKey(ATTR_ROLES)
         && realmAccess.get(ATTR_ROLES) instanceof List<?> roleList
@@ -69,6 +73,9 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
     return roleList.stream()
         .filter(role -> role != null && !String.valueOf(role).trim().isEmpty())
         .map(role -> String.valueOf(role).toUpperCase(Locale.ROOT))
+        .map(role -> role.startsWith(GRANTED_AUTHORITY_PREFIX)
+            ? role.replaceFirst(GRANTED_AUTHORITY_PREFIX, "")
+            : role)
         .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(GRANTED_AUTHORITY_PREFIX + role))
         .toList();
   }

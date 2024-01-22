@@ -30,10 +30,4 @@ public class ConfigController {
     log.info("TODO: update {}", config);
   }
 
-  @GetMapping(value = "/error/",  produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_PROBLEM_JSON_VALUE})
-  public PokerTimerConfig produceException() {
-    log.error("throw error now");
-    throw new RuntimeException("Expected error thrown");
-  }
-
 }

@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -20,29 +22,71 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles(value = "test")
 class ConfigControllerTest extends KeycloakTestContainer {
 
-  private static final String CONFIG_URL = "/config/";
+  private static final String ENDPOUNT_URL = "/config/";
 
   @Autowired
   private TestRestTemplate testRestTemplate;
 
   @Test
-  void testConfigGetEndpoint_Unauthorized_Forbidden() {
-    final ResponseEntity<PokerTimerConfig> response = testRestTemplate.getForEntity(CONFIG_URL, PokerTimerConfig.class);
-    assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
+  void testConfigGetEndpoint_Unauthorized() {
+    final ResponseEntity<PokerTimerConfig> response = testRestTemplate.getForEntity(ENDPOUNT_URL, PokerTimerConfig.class);
+    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
   }
 
   @Test
-  void testConfigGetEndpoint_Authorized() {
-    final String accessToken = keycloakSimpleApi.tokenManager().grantToken().getToken();
+  void testConfigGetEndpoint_Authorized_OK() {
+    final String accessToken = keycloakAdminApi.tokenManager().grantToken().getToken();
     final HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(accessToken);
 
     final ResponseEntity<PokerTimerConfig> response = testRestTemplate.exchange(
-        CONFIG_URL, HttpMethod.GET, new HttpEntity<>(headers), PokerTimerConfig.class);
+        ENDPOUNT_URL, HttpMethod.GET, new HttpEntity<>(headers), PokerTimerConfig.class);
 
     assertEquals(response.getStatusCode(), HttpStatus.OK);
     final PokerTimerConfig body = response.getBody();
     assertNotNull(body);
     assertEquals("PokerTimerConfig[roundInMinutes=12, warningTimeInMinutes=1, blindLevels=[]]", body.toString());
   }
+
+  @Test
+  void testConfigPostEndpoint_Unauthorized() {
+    final PokerTimerConfig testConfig = new PokerTimerConfig((short) 2, (short) 1, Collections.emptyList());
+    final HttpEntity<?> httpEntity = new HttpEntity<>(testConfig, new HttpHeaders());
+
+    final ResponseEntity<Object> response = testRestTemplate.exchange(
+        ENDPOUNT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
+
+    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+  }
+
+  @Test
+  void testConfigPostEndpoint_Authorized_FORBIDDEN() {
+
+    final String accessToken = keycloakUserApi.tokenManager().grantToken().getToken();
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(accessToken);
+    final PokerTimerConfig testConfig = new PokerTimerConfig((short) 2, (short) 1, Collections.emptyList());
+    final HttpEntity<?> httpEntity = new HttpEntity<>(testConfig, headers);
+
+    final ResponseEntity<Object> response = testRestTemplate.exchange(
+        ENDPOUNT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
+
+    assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+  }
+
+  @Test
+  void testConfigPostEndpoint_Authorized_OK() {
+    final String accessToken = keycloakAdminApi.tokenManager().grantToken().getToken();
+    final HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(accessToken);
+    final PokerTimerConfig testConfig = new PokerTimerConfig((short) 2, (short) 1, Collections.emptyList());
+    final HttpEntity<?> httpEntity = new HttpEntity<>(testConfig, headers);
+
+    final ResponseEntity<Object> response = testRestTemplate.exchange(
+        ENDPOUNT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+  }
+
 }

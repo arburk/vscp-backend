@@ -1,5 +1,6 @@
 package com.github.arburk.vscp.backend;
 
+import org.jetbrains.annotations.NotNull;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -14,9 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Testcontainers
 public abstract class KeycloakTestContainer {
@@ -25,20 +24,32 @@ public abstract class KeycloakTestContainer {
   private static final String MY_REALM_NAME = "vscp";
   private static final String SIMPLE_API_CLIENT_ID = "mytest-client-id";
   private static final String SIMPLE_API_CLIENT_SECRET = "my-secret-test-password";
-  private static final List<String> SIMPLE_API_ROLES = Collections.singletonList("ROLE_ADMIN");
-  private static final String USER_USERNAME = "my-admin-user";
-  private static final String USER_PASSWORD = "myAdminPassw0rd";
+  private static final List<String> SIMPLE_API_ROLES_ADMIN = Collections.singletonList("ROLE_ADMIN");
+  private static final List<String> SIMPLE_API_ROLES_USER = Collections.singletonList("ROLE_USER");
+  private static final String ADMIN_USERNAME = "my-admin-user";
+  private static final String USER_USERNAME = "my-user";
+  private static final String ADMIN_PASSWORD = "myAdminPassw0rd";
+  private static final String USER_PASSWORD = "myU5erPassw0rd";
+  private static final String KEYCLOAK_ADMIN = "admin";
+  private static final String KEYCLOAK_ADMIN_PW = "admin";
 
+  /**
+   * representation of a user having ROLE_ADMIN assigned
+   */
+  protected static Keycloak keycloakAdminApi;
 
-  protected static Keycloak keycloakSimpleApi;
+  /**
+   * representation of a user having ROLE_USER assigned
+   */
+  protected static Keycloak keycloakUserApi;
 
   private static final GenericContainer<?> keycloakContainer = new GenericContainer<>(IMAGE);
 
   @DynamicPropertySource
   private static void dynamicProperties(DynamicPropertyRegistry registry) {
     keycloakContainer.withExposedPorts(8080)
-        .withEnv("KEYCLOAK_ADMIN", "admin")
-        .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin")
+        .withEnv("KEYCLOAK_ADMIN", KEYCLOAK_ADMIN)
+        .withEnv("KEYCLOAK_ADMIN_PASSWORD", KEYCLOAK_ADMIN_PW)
         .withEnv("KC_DB", "dev-mem")
         .withCommand("start-dev")
         .waitingFor(Wait.forHttp("/admin").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)))
@@ -52,53 +63,50 @@ public abstract class KeycloakTestContainer {
     registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
     registry.add("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", () -> issuerUri + "/protocol/openid-connect/certs");
 
-    if (keycloakSimpleApi == null) {
-      setupKeycloak(keycloakServerUrl);
+    if (keycloakAdminApi == null) {
+      setupKeycloakAdmin(keycloakServerUrl);
+      setupKeycloakUser(keycloakServerUrl);
     }
   }
 
-  private static void setupKeycloak(String keycloakServerUrl) {
-    final Keycloak keycloakAdmin = KeycloakBuilder.builder()
-        .serverUrl(keycloakServerUrl)
-        .realm("master")
-        .username("admin")
-        .password("admin")
-        .clientId("admin-cli")
-        .build();
-
-    // Realm
-    final RealmRepresentation realmRepresentation = new RealmRepresentation();
-    realmRepresentation.setRealm(MY_REALM_NAME);
-    realmRepresentation.setEnabled(true);
-
+  private static void setupKeycloakAdmin(String keycloakServerUrl) {
     // Client
     final ClientRepresentation clientRepresentation = new ClientRepresentation();
     clientRepresentation.setId(SIMPLE_API_CLIENT_ID);
     clientRepresentation.setDirectAccessGrantsEnabled(true);
     clientRepresentation.setSecret(SIMPLE_API_CLIENT_SECRET);
+
+    final UserRepresentation userRepresentation = getUserRepresentation(ADMIN_USERNAME, ADMIN_PASSWORD, SIMPLE_API_ROLES_ADMIN);
+
+    // Realm
+    final RealmRepresentation realmRepresentation = new RealmRepresentation();
+    realmRepresentation.setRealm(MY_REALM_NAME);
+    realmRepresentation.setEnabled(true);
     realmRepresentation.setClients(Collections.singletonList(clientRepresentation));
-
-    // Credentials
-    final CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
-    credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
-    credentialRepresentation.setValue(USER_PASSWORD);
-
-    // Client roles
-    final Map<String, List<String>> clientRoles = new HashMap<>();
-    clientRoles.put(SIMPLE_API_CLIENT_ID, SIMPLE_API_ROLES);
-
-    // User
-    final UserRepresentation userRepresentation = new UserRepresentation();
-    userRepresentation.setUsername(USER_USERNAME);
-    userRepresentation.setEnabled(true);
-    userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
-    userRepresentation.setClientRoles(clientRoles);
-
     realmRepresentation.setUsers(Collections.singletonList(userRepresentation));
 
-    keycloakAdmin.realms().create(realmRepresentation);
+    getKeycloakAdmin(keycloakServerUrl)
+        .realms()
+        .create(realmRepresentation);
 
-    keycloakSimpleApi = KeycloakBuilder.builder()
+    keycloakAdminApi = KeycloakBuilder.builder()
+        .serverUrl(keycloakServerUrl)
+        .realm(MY_REALM_NAME)
+        .username(ADMIN_USERNAME)
+        .password(ADMIN_PASSWORD)
+        .clientId(SIMPLE_API_CLIENT_ID)
+        .clientSecret(SIMPLE_API_CLIENT_SECRET)
+        .build();
+  }
+
+  private static void setupKeycloakUser(String keycloakServerUrl) {
+    getKeycloakAdmin(keycloakServerUrl)
+        .realms()
+        .realm(MY_REALM_NAME)
+        .users()
+        .create(getUserRepresentation(USER_USERNAME, USER_PASSWORD, SIMPLE_API_ROLES_USER));
+
+    keycloakUserApi = KeycloakBuilder.builder()
         .serverUrl(keycloakServerUrl)
         .realm(MY_REALM_NAME)
         .username(USER_USERNAME)
@@ -108,4 +116,32 @@ public abstract class KeycloakTestContainer {
         .build();
   }
 
+  @NotNull
+  private static UserRepresentation getUserRepresentation(final String userUsername, final String userPassword, final List<String> simpleApiRolesUser) {
+    final UserRepresentation userRepresentation = new UserRepresentation();
+    userRepresentation.setUsername(userUsername);
+    userRepresentation.setEnabled(true);
+    userRepresentation.setCredentials(Collections.singletonList(getPasswordCredentialRepresentation(userPassword)));
+    userRepresentation.setRealmRoles(simpleApiRolesUser);
+    return userRepresentation;
+  }
+
+  @NotNull
+  private static CredentialRepresentation getPasswordCredentialRepresentation(final String password) {
+    final CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+    credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+    credentialRepresentation.setValue(password);
+    return credentialRepresentation;
+  }
+
+  private static Keycloak getKeycloakAdmin(final String keycloakServerUrl) {
+    final Keycloak keycloakAdmin = KeycloakBuilder.builder()
+        .serverUrl(keycloakServerUrl)
+        .realm("master")
+        .username(KEYCLOAK_ADMIN)
+        .password(KEYCLOAK_ADMIN_PW)
+        .clientId("admin-cli")
+        .build();
+    return keycloakAdmin;
+  }
 }
