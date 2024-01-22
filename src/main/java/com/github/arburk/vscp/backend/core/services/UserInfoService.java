@@ -48,7 +48,7 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
   public static final String ATTR_ROLES = "roles";
   public static final String GRANTED_AUTHORITY_PREFIX = "ROLE_";
 
-  private AuthorizedParty authParty;
+  private final AuthorizedParty authParty;
 
   public UserInfoService(AuthorizedParty authParty) {
     this.authParty = authParty;

@@ -1,4 +1,5 @@
 [![Java CI with Maven](https://github.com/arburk/vscp-backend/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/arburk/vscp-backend/actions/workflows/maven.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=arburk_vscp-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=arburk_vscp-backend)
 
 # vscp-backend
 VSCP backend server providing REST API and business logic to manage app data of https://github.com/arburk/vscp.
