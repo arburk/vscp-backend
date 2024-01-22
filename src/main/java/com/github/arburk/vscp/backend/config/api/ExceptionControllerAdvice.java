@@ -19,7 +19,7 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ResponseBody
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
+  public ResponseEntity<ProblemDetail> handleControllerException(HttpServletRequest request, Throwable ex) {
     log.error("request {} failed: {}", request.getRequestURL(), ex.getMessage());
     final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
     return new ResponseEntity<>(getProblemDetail(request, ex, internalServerError), internalServerError);
@@ -27,7 +27,7 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ResponseBody
   @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<?> handleAccessDeniedException(HttpServletRequest request, Throwable ex) {
+  public ResponseEntity<ProblemDetail> handleAccessDeniedException(HttpServletRequest request, Throwable ex) {
     log.error("request {} failed: {}", request.getRequestURL(), ex.getMessage());
     final HttpStatus forbidden = HttpStatus.FORBIDDEN;
     final ProblemDetail problemDetail = getProblemDetail(request, ex, forbidden);

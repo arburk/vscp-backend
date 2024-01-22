@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class AuthorizedParty {
 
-  public final static String basic = "basicUserPass";
+  public static final String BASIC = "basicUserPass";
 
   @Value("${spring.security.oauth2.client.registration.google.client-id}")
   private String google; //authorized party client id

@@ -123,7 +123,7 @@ public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthori
   private static User getAsBasicUser(final UsernamePasswordAuthenticationToken userPass) {
     if (userPass.getPrincipal() instanceof org.springframework.security.core.userdetails.User springUser) {
       final List<String> roles = springUser.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-      return new User(AuthorizedParty.basic, springUser.getUsername(), springUser.getUsername(), null, null, null, null, null, roles);
+      return new User(AuthorizedParty.BASIC, springUser.getUsername(), springUser.getUsername(), null, null, null, null, null, roles);
     }
 
     return getBasicUserFallback(userPass);

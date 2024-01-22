@@ -42,7 +42,7 @@ class ConfigControllerTest extends KeycloakTestContainer {
     final ResponseEntity<PokerTimerConfig> response = testRestTemplate.exchange(
         ENDPOUNT_URL, HttpMethod.GET, new HttpEntity<>(headers), PokerTimerConfig.class);
 
-    assertEquals(response.getStatusCode(), HttpStatus.OK);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
     final PokerTimerConfig body = response.getBody();
     assertNotNull(body);
     assertEquals("PokerTimerConfig[roundInMinutes=12, warningTimeInMinutes=1, blindLevels=[]]", body.toString());
