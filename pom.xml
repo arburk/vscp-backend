@@ -79,7 +79,7 @@
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-admin-client</artifactId>
-      <version>23.0.4</version>
+      <version>23.0.5</version>
       <scope>test</scope>
     </dependency>
 
