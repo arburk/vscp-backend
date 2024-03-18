@@ -20,7 +20,7 @@ import java.util.List;
 @Testcontainers
 public abstract class KeycloakTestContainer {
 
-  private static final String IMAGE = "quay.io/keycloak/keycloak:23.0.4";
+  private static final String IMAGE = "quay.io/keycloak/keycloak:24.0.1";
   private static final String MY_REALM_NAME = "vscp";
   private static final String SIMPLE_API_CLIENT_ID = "mytest-client-id";
   private static final String SIMPLE_API_CLIENT_SECRET = "my-secret-test-password";
@@ -65,6 +65,8 @@ public abstract class KeycloakTestContainer {
 
     if (keycloakAdminApi == null) {
       setupKeycloakAdmin(keycloakServerUrl);
+    }
+    if(keycloakUserApi == null) {
       setupKeycloakUser(keycloakServerUrl);
     }
   }
@@ -123,6 +125,17 @@ public abstract class KeycloakTestContainer {
     userRepresentation.setEnabled(true);
     userRepresentation.setCredentials(Collections.singletonList(getPasswordCredentialRepresentation(userPassword)));
     userRepresentation.setRealmRoles(simpleApiRolesUser);
+
+    /* Enable verify-profile required action by default was introduced by keycloak v24
+     * see https://www.keycloak.org/2024/03/keycloak-2400-released
+     * Thus at least email, first and last name needs to be provided to enable direct access grant
+     * see https://github.com/keycloak/keycloak/blob/main/docs/documentation/server_admin/topics/users/user-profile.adoc#understanding-the-default-configuration
+     */
+    userRepresentation.setEmail(userUsername +".keycloak24@requires-email.com");
+    userRepresentation.setEmailVerified(true);
+    userRepresentation.setFirstName("first " + userUsername);
+    userRepresentation.setLastName("last " + userUsername);
+
     return userRepresentation;
   }
 
