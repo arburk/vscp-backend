@@ -20,7 +20,7 @@ import java.util.List;
 @Testcontainers
 public abstract class KeycloakTestContainer {
 
-  private static final String IMAGE = "quay.io/keycloak/keycloak:24.0.1";
+  private static final String IMAGE = "quay.io/keycloak/keycloak:25.0.0";
   private static final String MY_REALM_NAME = "vscp";
   private static final String SIMPLE_API_CLIENT_ID = "mytest-client-id";
   private static final String SIMPLE_API_CLIENT_SECRET = "my-secret-test-password";
