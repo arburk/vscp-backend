@@ -22,14 +22,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles(value = "test")
 class ConfigControllerTest extends KeycloakTestContainer {
 
-  private static final String ENDPOUNT_URL = "/config/";
+  private static final String ENDPOINT_URL = "/config/";
 
   @Autowired
   private TestRestTemplate testRestTemplate;
 
   @Test
   void testConfigGetEndpoint_Unauthorized() {
-    final ResponseEntity<PokerTimerConfig> response = testRestTemplate.getForEntity(ENDPOUNT_URL, PokerTimerConfig.class);
+    final ResponseEntity<PokerTimerConfig> response = testRestTemplate.getForEntity(ENDPOINT_URL, PokerTimerConfig.class);
     assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
   }
 
@@ -40,7 +40,7 @@ class ConfigControllerTest extends KeycloakTestContainer {
     headers.setBearerAuth(accessToken);
 
     final ResponseEntity<PokerTimerConfig> response = testRestTemplate.exchange(
-        ENDPOUNT_URL, HttpMethod.GET, new HttpEntity<>(headers), PokerTimerConfig.class);
+        ENDPOINT_URL, HttpMethod.GET, new HttpEntity<>(headers), PokerTimerConfig.class);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     final PokerTimerConfig body = response.getBody();
@@ -54,7 +54,7 @@ class ConfigControllerTest extends KeycloakTestContainer {
     final HttpEntity<?> httpEntity = new HttpEntity<>(testConfig, new HttpHeaders());
 
     final ResponseEntity<Object> response = testRestTemplate.exchange(
-        ENDPOUNT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
+        ENDPOINT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
 
     assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
   }
@@ -70,7 +70,7 @@ class ConfigControllerTest extends KeycloakTestContainer {
     final HttpEntity<?> httpEntity = new HttpEntity<>(testConfig, headers);
 
     final ResponseEntity<Object> response = testRestTemplate.exchange(
-        ENDPOUNT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
+        ENDPOINT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
 
     assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
   }
@@ -84,7 +84,7 @@ class ConfigControllerTest extends KeycloakTestContainer {
     final HttpEntity<?> httpEntity = new HttpEntity<>(testConfig, headers);
 
     final ResponseEntity<Object> response = testRestTemplate.exchange(
-        ENDPOUNT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
+        ENDPOINT_URL, HttpMethod.POST, httpEntity, (Class<Object>) null, Collections.emptyMap());
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
   }
