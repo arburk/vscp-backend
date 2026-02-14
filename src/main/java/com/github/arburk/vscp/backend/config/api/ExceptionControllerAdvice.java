@@ -3,6 +3,7 @@ package com.github.arburk.vscp.backend.config.api;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,11 +36,11 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(problemDetail, forbidden);
   }
 
-  private static ProblemDetail getProblemDetail(final HttpServletRequest request, final Throwable ex, final HttpStatus status) {
+  private static ProblemDetail getProblemDetail(final HttpServletRequest request, final Throwable ex, final HttpStatusCode status) {
     ProblemDetail problemDetail = ProblemDetail.forStatus(status);
     problemDetail.setDetail(ex.getMessage());
-    final String server = String.format("%s://%s", request.getScheme(), request.getServerName());
-    final String port = String.format("://%s", request.getServerPort());
+    final String server = "%s://%s".formatted(request.getScheme(), request.getServerName());
+    final String port = "://%s".formatted(request.getServerPort());
     final URI instance = URI.create(request.getServletPath().replace(server, "").replace(port, ""));
     problemDetail.setInstance(instance);
     problemDetail.setProperty("Method", request.getMethod());
