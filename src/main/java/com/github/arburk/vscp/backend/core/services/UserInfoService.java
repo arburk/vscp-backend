@@ -6,6 +6,7 @@ import com.nimbusds.jose.shaded.gson.internal.LinkedTreeMap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
  * Maps the user's info into domain DTO independent of auth mechanism and origin
  */
 @Component
+@Configuration
 @Slf4j
 public class UserInfoService implements Converter<Jwt, Collection<GrantedAuthority>> {
 

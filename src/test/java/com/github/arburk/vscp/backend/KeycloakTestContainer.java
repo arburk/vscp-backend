@@ -58,8 +58,8 @@ public abstract class KeycloakTestContainer {
     final String keycloakHost = keycloakContainer.getHost();
     final Integer keycloakPort = keycloakContainer.getMappedPort(8080);
 
-    final String keycloakServerUrl = String.format("http://%s:%s", keycloakHost, keycloakPort);
-    final String issuerUri = String.format("%s/realms/%s", keycloakServerUrl, MY_REALM_NAME);
+    final String keycloakServerUrl = "http://%s:%s".formatted(keycloakHost, keycloakPort);
+    final String issuerUri = "%s/realms/%s".formatted(keycloakServerUrl, MY_REALM_NAME);
     registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
     registry.add("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", () -> issuerUri + "/protocol/openid-connect/certs");
 
